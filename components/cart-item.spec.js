@@ -27,4 +27,47 @@ describe('CartItem', () => {
     expect(screen.getByTestId('image')).toHaveProperty('src', product.image);
     expect(screen.getByTestId('image')).toHaveProperty('alt', product.description);
   });
+
+  it('sould display 1 as initial quantity', () => {
+    renderCartItem();
+
+    expect(screen.getByTestId('quantity').textContent).toBe('1');
+  });
+
+  it('should increase quantity by 1 when second button is clicked', async () => {
+    renderCartItem();
+
+    const [_, button] = screen.getAllByRole('button');
+
+    await fireEvent.click(button);
+
+    expect(screen.getByTestId('quantity').textContent).toBe('2');
+  });
+
+  it('should decrease quantity by 1 when first button is clicked', async () => {
+    renderCartItem();
+
+    const [buttonDecrease, buttonIncrease] = screen.getAllByRole('button');
+    const quantity = screen.getByTestId('quantity');
+
+    await fireEvent.click(buttonIncrease);
+    expect(quantity.textContent).toBe('2');
+
+    await fireEvent.click(buttonDecrease);
+    expect(quantity.textContent).toBe('1');
+  });
+
+  it('should not go below zero in the quantity', async () => {
+    renderCartItem();
+
+    const [buttonDecrease] = screen.getAllByRole('button');
+    const quantity = screen.getByTestId('quantity');
+
+    expect(quantity.textContent).toBe('1');
+
+    await fireEvent.click(buttonDecrease);
+    await fireEvent.click(buttonDecrease);
+
+    expect(quantity.textContent).toBe('0');
+  });
 });
